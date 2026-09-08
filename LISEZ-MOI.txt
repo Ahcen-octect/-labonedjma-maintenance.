@@ -1,0 +1,172 @@
+══════════════════════════════════════════════════════════════════
+  LaboNedjma · Application Maintenance PRO v2 — Guide de déploiement
+══════════════════════════════════════════════════════════════════
+
+NOUVEAUTÉS DE CETTE VERSION
+────────────────────────────
+  ✅ Comptes avec mot de passe : Technicien / Chef / Admin
+  ✅ Chaque technicien est rattaché à un chef
+  ✅ Le chef voit automatiquement les fiches et stats de son équipe
+  ✅ L'admin voit tout et gère tous les comptes (créer/modifier/supprimer)
+  ✅ Équipements en 3 catégories filtrables : Machines / Transpalettes / Gerbeurs
+  ✅ 4 transpalettes et 3 gerbeurs préconfigurés (modifiables)
+  ✅ Tout le reste de la v1 est conservé (scan QR, export Excel, hors-ligne...)
+
+CONTENU DU DOSSIER
+──────────────────
+  index.html          → Application principale (tout en 1 fichier)
+  manifest.json       → Configuration PWA
+  sw.js                → Service Worker (mode hors ligne)
+  icons/               → Icônes de l'app
+  LISEZ-MOI.txt        → Ce fichier
+
+══════════════════════════════════════════════════════════════════
+  PREMIÈRE CONNEXION
+══════════════════════════════════════════════════════════════════
+
+  Un compte administrateur est créé AUTOMATIQUEMENT au tout premier
+  lancement de l'app (dès que quelqu'un ouvre l'URL) :
+
+      Identifiant : admin
+      Mot de passe : admin123
+
+  ⚠️ Changez ce mot de passe (ou créez votre propre compte admin
+  et supprimez celui-ci) dès la première connexion, via
+  Onglet "Équipe" → "Tous les comptes" → Modifier.
+
+  Ensuite, connecté en tant qu'admin :
+  1. Allez dans l'onglet "Équipe" (icône 👥, visible seulement pour
+     Chef/Admin) → sous-onglet "Tous les comptes"
+  2. "➕ Créer un compte" pour chaque Chef, puis chaque Technicien
+     (en les rattachant au bon chef dans le formulaire)
+  3. Communiquez à chacun son identifiant + mot de passe
+
+  Les comptes et les fiches sont synchronisés en temps réel entre
+  TOUS les téléphones via Firebase — pas besoin de reconfigurer
+  Firebase, c'est déjà branché et fonctionnel dans ce fichier.
+
+══════════════════════════════════════════════════════════════════
+  QUI VOIT QUOI
+══════════════════════════════════════════════════════════════════
+
+  Technicien : voit et crée uniquement SES propres fiches et stats.
+  Chef       : voit les fiches/stats de tous les techniciens qui lui
+               sont rattachés, + les siennes s'il intervient aussi.
+               Onglet "Équipe" → liste de son équipe avec compteurs.
+  Admin      : voit tout, toutes les équipes, gère tous les comptes.
+
+══════════════════════════════════════════════════════════════════
+  ÉQUIPEMENTS PRÉCONFIGURÉS
+══════════════════════════════════════════════════════════════════
+
+  MACHINES (15)              TRANSPALETTES (4)      GERBEURS (3)
+  LB-01 à LB-15               TP-01 Manuel 1          GB-01 Électrique 1
+  (identiques à la v1)         TP-02 Manuel 2          GB-02 Électrique 2
+                                TP-03 Électrique 1      GB-03 Manuel
+                                TP-04 Électrique 2
+
+  → Pour modifier/ajouter des équipements : ouvrez index.html,
+    cherchez "const EQUIPMENT" et ajoutez une ligne avec le même
+    format : { code: 'TP-05', name: '...', icon: '🛒', cat: 'Transpalette' }
+    (cat doit être 'Machine', 'Transpalette' ou 'Gerbeur')
+
+══════════════════════════════════════════════════════════════════
+  OPTION A — HÉBERGEMENT GRATUIT SUR INTERNET (recommandé)
+══════════════════════════════════════════════════════════════════
+
+  NETLIFY (le plus simple, 5 minutes) :
+  1. Créez un compte sur https://netlify.com (gratuit)
+  2. Glissez-déposez ce dossier entier sur netlify.com/drop
+  3. Votre app est en ligne : https://xxxxx.netlify.app
+  4. HTTPS inclus → scan caméra fonctionnel, et c'est CETTE URL
+     que vous utiliserez à l'étape APK ci-dessous.
+
+══════════════════════════════════════════════════════════════════
+  OPTION A bis — GITHUB PAGES (gratuit, alternative à Netlify)
+══════════════════════════════════════════════════════════════════
+
+  1. Créez un compte sur https://github.com (gratuit)
+  2. "New repository" → nommez-le ex: labonedjma-maintenance →
+     cochez "Public" → "Create repository"
+  3. Sur la page du dépôt → "uploading an existing file" (ou
+     glissez-déposez) → sélectionnez TOUS les fichiers de ce
+     dossier (index.html, manifest.json, sw.js, icons/,
+     LISEZ-MOI.txt) → "Commit changes"
+  4. Menu du dépôt → "Settings" → "Pages" (dans le menu de gauche)
+  5. "Branch" → choisissez "main" → "Save"
+  6. Après 1-2 minutes, votre app est en ligne à l'adresse :
+       https://votre-nom-utilisateur.github.io/labonedjma-maintenance
+  7. HTTPS inclus → scan caméra fonctionnel, et c'est CETTE URL
+     que vous utiliserez à l'étape APK ci-dessous (ou pour "Ajouter
+     à l'écran d'accueil" directement sur les téléphones).
+
+  ⚠️ Un dépôt "Public" veut juste dire que le code source est
+  visible publiquement sur GitHub — pas vos données (records/users
+  sont dans Firebase, séparé). Si vous préférez un dépôt privé,
+  GitHub Pages fonctionne aussi avec un compte payant, ou utilisez
+  Netlify (Option A) qui reste gratuit et privé par défaut.
+
+══════════════════════════════════════════════════════════════════
+  OPTION B — DÉPLOIEMENT LOCAL (réseau interne usine)
+══════════════════════════════════════════════════════════════════
+
+  1. Copiez ce dossier sur un PC connecté au Wi-Fi de l'usine
+  2. Terminal dans ce dossier : python -m http.server 8080
+  3. Trouvez l'IP du PC (Windows: ipconfig / Linux: ip a)
+  4. Sur chaque téléphone : http://IP_DU_PC:8080
+
+  ⚠️ Le scan caméra QR nécessite HTTPS — voir mkcert dans les
+  guides précédents si besoin, ou préférez l'Option A (Netlify).
+
+══════════════════════════════════════════════════════════════════
+  GÉNÉRER UN FICHIER .APK INSTALLABLE (Android)
+══════════════════════════════════════════════════════════════════
+
+  Cette app est une PWA (Progressive Web App). Pour obtenir un
+  vrai fichier .apk que vous pouvez installer/partager comme une
+  app native Android, utilisez PWABuilder — outil gratuit et
+  officiel (soutenu par Microsoft), aucune compétence technique
+  requise :
+
+  ÉTAPE 1 — Hébergez d'abord l'app en ligne (Option A ci-dessus,
+  Netlify) pour obtenir une URL HTTPS publique, ex :
+      https://labonedjma-maintenance.netlify.app
+
+  ÉTAPE 2 — Générer l'APK :
+  1. Allez sur https://www.pwabuilder.com
+  2. Collez votre URL Netlify dans le champ de recherche → "Start"
+  3. PWABuilder analyse votre app (manifest.json + sw.js déjà prêts
+     dans ce dossier, donc le score sera bon directement)
+  4. Cliquez sur le bouton "Package for stores" (ou "Android")
+  5. Choisissez "Android" → laissez les options par défaut →
+     "Generate" / "Download"
+  6. Vous obtenez un fichier .zip contenant un .apk (et un .aab
+     pour le Play Store si un jour vous voulez le publier)
+  7. Transférez le .apk sur les téléphones des techniciens
+     (WhatsApp, clé USB, lien de téléchargement…)
+
+  ÉTAPE 3 — Installer le .apk sur un téléphone Android :
+  1. Ouvrir le fichier .apk reçu
+  2. Android demandera d'autoriser "Sources inconnues" la première
+     fois (Paramètres → Sécurité → Autoriser cette source)
+  3. Installer → l'app apparaît sur l'écran d'accueil comme une
+     app native, avec sa propre icône
+
+  ℹ️ Alternative sans passer par PWABuilder : sur Android/Chrome,
+  ouvrir directement l'URL Netlify puis "Ajouter à l'écran
+  d'accueil" donne un résultat quasi identique (icône, plein écran,
+  hors-ligne) sans fichier .apk à distribuer — plus simple si vous
+  n'avez pas besoin d'un fichier à transférer manuellement.
+
+══════════════════════════════════════════════════════════════════
+  UTILISATION DES QR CODES
+══════════════════════════════════════════════════════════════════
+
+  1. Onglet "QR" → "Imprimer tous les QR codes" (groupés par
+     catégorie : Machines / Transpalettes / Gerbeurs)
+  2. Découper et coller chaque QR code sur l'équipement correspondant
+  3. Les techniciens scannent → formulaire pré-rempli s'ouvre
+
+══════════════════════════════════════════════════════════════════
+  LaboNedjma · Application Maintenance PRO · Version 2.0
+══════════════════════════════════════════════════════════════════
